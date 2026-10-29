@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>QuickReply test fields</title>
+    <style>
+      body { font: 14px system-ui; padding: 24px; display: grid; gap: 12px; max-width: 640px; }
+      input, textarea, [contenteditable] { font: inherit; border: 1px solid #ccc; padding: 6px; min-height: 20px; }
+    </style>
+  </head>
+  <body>
+    <input id="input" type="text" aria-label="Plain input" />
+    <input id="search" type="search" aria-label="Search input" />
+    <textarea id="textarea" rows="5" aria-label="Textarea"></textarea>
+    <div id="editor" contenteditable="true" aria-label="Rich editor"></div>
+    <div id="gmail" contenteditable="true" role="textbox" aria-label="Message Body" aria-multiline="true"><div><br /></div></div>
+    <div id="shadow-host"></div>
+    <input id="password" type="password" aria-label="Password" />
+    <input id="card" type="text" autocomplete="cc-number" aria-label="Card number" />
+    <input id="otp" type="text" name="otp" aria-label="Code" />
+    <input id="ignored" type="text" data-quickreply-ignore aria-label="Opted out" />
+    <script>
+      const host = document.getElementById('shadow-host');
+      const root = host.attachShadow({ mode: 'open' });
+      const ed = document.createElement('div');
+      ed.id = 'shadow-editor';
+      ed.contentEditable = 'true';
+      ed.style.cssText = 'border:1px solid #ccc;padding:6px;min-height:20px';
+      root.append(ed);
+    </script>
+  </body>
+</html>

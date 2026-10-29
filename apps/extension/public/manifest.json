@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "QuickReply — Text Expander & Auto Text",
+  "short_name": "QuickReply",
+  "version": "1.0.0",
+  "description": "Save text snippets and insert them anywhere with short shortcuts like /hello. Local-only, no account needed.",
+  "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "QuickReply",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "options_ui": {
+    "page": "dashboard.html#/settings",
+    "open_in_tab": true
+  },
+  "permissions": ["storage"],
+  "optional_permissions": ["clipboardRead"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ]
+}

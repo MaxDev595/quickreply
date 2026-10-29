@@ -1,0 +1,17 @@
+{
+  "name": "@quickreply/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure, framework-free QuickReply logic: types, matcher, template variables, import/export validation.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.5"
+  }
+}
