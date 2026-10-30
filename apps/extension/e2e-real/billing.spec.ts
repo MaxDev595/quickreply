@@ -189,7 +189,14 @@ test('Pro Annual: Upgrade from the extension → pay USDT → plan active in the
   expect(checkout.url()).toMatch(/localhost:4790\/pricing\/\?install=[0-9a-f-]{36}#checkout/);
   await expect(checkout.getByRole('note').filter({ hasText: 'Test mode' })).toBeVisible();
 
-  await checkout.getByRole('radio', { name: /Pro Annual/ }).click();
+  // Pro is one card; the period is a Monthly/Yearly switch
+  await checkout.getByRole('radio', { name: /Monthly/ }).click();
+  await expect(checkout.getByRole('radio', { name: 'Pro, monthly' })).toHaveAttribute('aria-checked', 'true');
+  await expect(checkout.getByText('$3.99').first()).toBeVisible();
+  await checkout.getByRole('radio', { name: /Yearly/ }).click();
+  await expect(checkout.getByRole('radio', { name: 'Pro, yearly' })).toHaveAttribute('aria-checked', 'true');
+  await expect(checkout.getByText('$2.42/month, billed yearly')).toBeVisible();
+  await expect(checkout.getByRole('radio', { name: /Pro Annual|Pro Monthly/ })).toHaveCount(0);
   await checkout.getByRole('radio', { name: /USDT \(TON\)/ }).click();
   await checkout.getByRole('button', { name: 'Continue to payment' }).click();
   await expect(checkout.getByText('Waiting for payment')).toBeVisible();

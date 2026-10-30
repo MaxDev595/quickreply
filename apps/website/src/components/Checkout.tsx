@@ -2,7 +2,6 @@
 
 import {
   MAX_SEATS,
-  PAID_PLANS,
   PLANS,
   formatUsd,
   totalCents,
@@ -81,6 +80,7 @@ export function Checkout() {
   const [config, setConfig] = useState<Config | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
   const [plan, setPlan] = useState<PaidPlanId>('pro_annual');
+  const [proPlan, setProPlan] = useState<'pro_monthly' | 'pro_annual'>('pro_annual');
   const [seats, setSeats] = useState(5);
   const [currency, setCurrency] = useState<PayCurrency>('USDT');
   const [invoice, setInvoice] = useState<InvoiceView | null>(null);
@@ -188,32 +188,64 @@ export function Checkout() {
               ))}
             </ul>
           </div>
-          <div role="radiogroup" aria-label="Plan" className="mt-5 grid gap-3 sm:grid-cols-3">
-            {PAID_PLANS.map((id) => {
-              const info = PLANS[id];
-              const selected = plan === id;
-              return (
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <span className="text-[14px] font-medium">Pro billing</span>
+            <div role="radiogroup" aria-label="Billing period" className="inline-flex rounded-lg border border-line p-0.5">
+              {(
+                [
+                  ['pro_monthly', 'Monthly'],
+                  ['pro_annual', 'Yearly'],
+                ] as const
+              ).map(([id, label]) => (
                 <button
                   key={id}
                   type="button"
                   role="radio"
+                  aria-checked={proPlan === id}
+                  disabled={!!invoice && invoice.status === 'pending'}
+                  onClick={() => {
+                    setProPlan(id);
+                    setPlan(id);
+                  }}
+                  className={`rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors disabled:opacity-60 ${proPlan === id ? 'bg-accent text-white' : 'text-muted hover:text-fg'}`}
+                >
+                  {label}
+                  {id === 'pro_annual' && <span className={`ml-1.5 text-[11px] ${proPlan === id ? 'text-white/90' : 'text-accent'}`}>save 39%</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div role="radiogroup" aria-label="Plan" className="mt-4 grid gap-3 sm:grid-cols-2">
+            {([proPlan, 'business_monthly'] as const).map((id) => {
+              const info = PLANS[id];
+              const isPro = id !== 'business_monthly';
+              const selected = plan === id;
+              return (
+                <button
+                  key={isPro ? 'pro' : id}
+                  type="button"
+                  role="radio"
                   aria-checked={selected}
+                  aria-label={isPro ? `Pro, ${id === 'pro_annual' ? 'yearly' : 'monthly'}` : info.name}
                   disabled={!!invoice && invoice.status === 'pending'}
                   onClick={() => setPlan(id)}
-                  className={`relative rounded-xl border p-4 text-left transition-colors disabled:opacity-60 ${selected ? 'border-accent bg-accent-soft' : 'border-line hover:border-line-strong'}`}
+                  className={`relative flex flex-col justify-start rounded-xl border p-4 text-left transition-colors disabled:opacity-60 ${selected ? 'border-accent bg-accent-soft' : 'border-line hover:border-line-strong'}`}
                 >
-                  {info.recommended && (
+                  {id === 'pro_annual' && (
                     <span className="absolute -top-2.5 right-3 rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold text-white">Best value</span>
                   )}
-                  <div className="text-[15px] font-semibold">{info.name}</div>
+                  <div className="text-[15px] font-semibold">{isPro ? 'Pro' : info.name}</div>
                   <div className="mt-1 text-[22px] font-semibold tracking-[-0.02em]">
                     {formatUsd(info.priceCents)}
                     <span className="text-[13px] font-normal text-muted">
                       {info.perSeat ? ' /user/mo' : info.periodDays >= 365 ? ' /year' : ' /month'}
                     </span>
                   </div>
+                  <div className="mt-0.5 h-4 text-[12px] text-muted">
+                    {id === 'pro_annual' ? `${formatUsd(Math.round(info.priceCents / 12))}/month, billed yearly` : ''}
+                  </div>
                   <ul className="mt-3 flex flex-col gap-1 text-[13px] text-muted">
-                    {info.features.map((f) => (
+                    {(isPro ? PLANS.pro_monthly : info).features.map((f) => (
                       <li key={f} className="flex gap-1.5">
                         <Check size={14} className="mt-0.5 shrink-0 text-accent" />
                         {f}
