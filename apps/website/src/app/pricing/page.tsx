@@ -7,7 +7,7 @@ import { siteConfig } from '@/site.config';
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: 'QuickReply Free includes up to 5 snippets. Pro removes the limit and adds sync; Business adds team features.',
+  description: 'QuickReply Free includes up to 5 snippets. Pro removes the limit; Business covers your whole team.',
   alternates: { canonical: '/pricing/' },
 };
 
@@ -22,7 +22,7 @@ export default function PricingPage() {
         <section className="mx-auto max-w-[1120px] px-5 pt-16 pb-12 sm:px-8">
           <h1 className="text-[40px] leading-tight font-semibold tracking-[-0.03em]">Pricing</h1>
           <p className="mt-3 max-w-[560px] text-[17px] leading-relaxed text-muted">
-            Start free with up to 5 snippets. Pro removes the limit and adds cloud sync; Business adds team features.
+            Start free with up to 5 snippets. Pro removes the limit; Business gives your whole team unlimited snippets with one license key.
           </p>
           {!checkout && (
             <div className="mt-10 grid overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4" style={{ gap: 1 }}>

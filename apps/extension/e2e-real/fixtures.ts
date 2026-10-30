@@ -11,7 +11,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { test as base, chromium, expect, type BrowserContext, type Page } from '@playwright/test';
 
-export const EXT_PATH = process.env.QR_EXT_PATH ?? resolve(import.meta.dirname, '../dist');
+export const EXT_PATH = process.env.QR_EXT_PATH ?? resolve(import.meta.dirname, '../dist-local');
 export const QA_PORT = 4795;
 export const QA = `http://localhost:${QA_PORT}`;
 export const CHROME = process.env.CHROME_PATH ?? '/opt/uc/chrome';

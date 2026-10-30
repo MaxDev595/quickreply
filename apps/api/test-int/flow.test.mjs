@@ -7,7 +7,7 @@ import { randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 import { after, before, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { startMockTonApi } from './mock-tonapi.mjs';
+import { OUR_USDT_WALLET, startMockTonApi } from './mock-tonapi.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const API = 'http://127.0.0.1:8799';
@@ -41,11 +41,11 @@ const api = async (path, init) => {
   return { status: res.status, body: await res.json(), headers: res.headers };
 };
 
-function chainEvent({ id, amount, comment, type = 'TonTransfer', master = USDT_RAW, ts = Math.floor(Date.now() / 1000) }) {
+function chainEvent({ id, amount, comment, type = 'TonTransfer', master = USDT_RAW, jettonWallet = OUR_USDT_WALLET, ts = Math.floor(Date.now() / 1000) }) {
   const action =
     type === 'TonTransfer'
       ? { type, status: 'ok', TonTransfer: { sender: { address: PAYER }, recipient: { address: WALLET_RAW.toUpperCase() }, amount: Number(amount), comment } }
-      : { type, status: 'ok', JettonTransfer: { sender: { address: PAYER }, recipient: { address: WALLET_RAW }, amount: String(amount), comment, jetton: { address: master, symbol: 'USD₮', decimals: 6 } } };
+      : { type, status: 'ok', JettonTransfer: { sender: { address: PAYER }, recipient: { address: WALLET_RAW }, recipients_wallet: jettonWallet, amount: String(amount), comment, jetton: { address: master, symbol: 'USD₮', decimals: 6 } } };
   return { event_id: id, timestamp: ts, lt: Date.now(), in_progress: false, actions: [action] };
 }
 
@@ -168,9 +168,11 @@ describe('billing flow (test mode)', () => {
     assert.ok(days > 394.9 && days < 395.1, `expected ~395 days, got ${days}`);
   });
 
-  it('a fake "USDT" jetton does not pay', async () => {
+  it('a fake "USDT" jetton (own master, or real master spoofed) does not pay', async () => {
     const { body: inv3 } = await api('/v1/invoices', { method: 'POST', body: JSON.stringify({ installId: installB, plan: 'pro_monthly', currency: 'USDT' }) });
-    await pushEvent(chainEvent({ id: 'ev-fake', amount: 3_990_000, comment: inv3.comment, type: 'JettonTransfer', master: PAYER }));
+    await pushEvent(chainEvent({ id: 'ev-fake', amount: 3_990_000, comment: inv3.comment, type: 'JettonTransfer', master: PAYER, jettonWallet: PAYER }));
+    // A token that claims the real USDT master in its metadata but arrives through another jetton wallet
+    await pushEvent(chainEvent({ id: 'ev-spoof', amount: 3_990_000, comment: inv3.comment, type: 'JettonTransfer', jettonWallet: '0:' + 'd'.repeat(64) }));
     await new Promise((r) => setTimeout(r, 8_500));
     const { body } = await api(`/v1/invoices/${inv3.id}?installId=${installB}`);
     assert.equal(body.status, 'pending');

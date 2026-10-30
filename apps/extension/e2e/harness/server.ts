@@ -11,7 +11,8 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { extname, join, normalize, resolve } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '../..');
-const DIST = join(ROOT, 'dist');
+// A build without plans/limits (npm run build:local); the tests create many snippets.
+const DIST = join(ROOT, process.env.QR_DIST ?? 'dist-local');
 const FIXTURES = join(ROOT, 'e2e/fixtures');
 const FIXTURES_BUILD = join(ROOT, 'e2e/.fixtures-build');
 

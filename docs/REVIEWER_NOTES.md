@@ -1,6 +1,6 @@
 # Notes for the Chrome Web Store reviewer
 
-QuickReply is a text expander. It needs no account and has no server component.
+QuickReply is a text expander. It needs no account. The Free plan allows 5 snippets; paid plans (bought on our website with crypto) remove the limit. The extension's dashboard checks the plan with our billing API using a random install ID; nothing else is sent.
 
 ## How to test (2 minutes)
 

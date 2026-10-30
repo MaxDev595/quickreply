@@ -29,6 +29,33 @@ export class TonApi {
     return data.events ?? [];
   }
 
+  /**
+   * Our jetton wallet for `master` (raw form), computed on-chain by the master's
+   * get_wallet_address(owner). Falls back to the owner's jetton balance record.
+   */
+  async jettonWallet(master: string, owner: string): Promise<string | null> {
+    const pick = (v: unknown): string | null => {
+      if (typeof v === 'string' && v) return v;
+      if (v && typeof v === 'object' && typeof (v as { address?: unknown }).address === 'string') return (v as { address: string }).address;
+      return null;
+    };
+    try {
+      const r = await this.get<{ success?: boolean; decoded?: Record<string, unknown> }>(
+        `/v2/blockchain/accounts/${encodeURIComponent(master)}/methods/get_wallet_address?args=${encodeURIComponent(owner)}`,
+      );
+      const a = r.success === false ? null : pick(r.decoded?.jetton_wallet_address);
+      if (a) return a;
+    } catch {
+      /* try the balance record */
+    }
+    try {
+      const r = await this.get<{ wallet_address?: unknown }>(`/v2/accounts/${encodeURIComponent(owner)}/jettons/${encodeURIComponent(master)}`);
+      return pick(r.wallet_address);
+    } catch {
+      return null;
+    }
+  }
+
   /** TON price in USD, or null if unavailable. */
   async tonUsd(): Promise<number | null> {
     const data = await this.get<{ rates?: Record<string, { prices?: Record<string, number> }> }>('/v2/rates?tokens=ton&currencies=usd');

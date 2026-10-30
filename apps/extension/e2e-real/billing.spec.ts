@@ -101,7 +101,7 @@ async function pay(comment: string, amount: string, currency: 'USDT' | 'TON') {
       : {
           type: 'JettonTransfer',
           status: 'ok',
-          JettonTransfer: { sender: { address: '0:' + '1'.repeat(64) }, recipient: { address: WALLET_RAW }, amount, comment, jetton: { address: USDT_RAW, symbol: 'USD₮', decimals: 6 } },
+          JettonTransfer: { sender: { address: '0:' + '1'.repeat(64) }, recipient: { address: WALLET_RAW }, recipients_wallet: '0:' + 'c'.repeat(64), amount, comment, jetton: { address: USDT_RAW, symbol: 'USD₮', decimals: 6 } },
         };
   await fetch(`${MOCK}/__events`, {
     method: 'POST',

@@ -8,7 +8,10 @@
  * - The comment must equal the invoice comment exactly (case-insensitive, trimmed).
  * - TON: TonTransfer with amount >= invoice amount.
  * - USDT: JettonTransfer whose jetton master is on the allowlist (never trust the
- *   name/symbol: anyone can mint a jetton called "USDT"), amount >= invoice amount.
+ *   name/symbol: anyone can mint a jetton called "USDT") AND whose receiving jetton
+ *   wallet is our own USDT wallet, derived on-chain from the real USDT master
+ *   (get_wallet_address). A fake token can claim any master in its metadata, but it
+ *   can't make a transfer arrive through our genuine USDT wallet. amount >= invoice amount.
  * - Each event can pay at most one invoice; event ids are recorded so a payment
  *   is never counted twice.
  */
@@ -26,6 +29,9 @@ export interface TonApiAction {
   JettonTransfer?: {
     sender?: TonApiAccountAddress;
     recipient?: TonApiAccountAddress;
+    /** Jetton wallet that received the tokens (ours, if genuine). */
+    recipients_wallet?: string;
+    senders_wallet?: string;
     amount: string;
     comment?: string;
     jetton: { address: string; symbol?: string; decimals?: number };
@@ -63,6 +69,8 @@ export interface PaymentMatch {
 export interface MatchConfig {
   payTo: string;
   usdtMasters: string[];
+  /** Our USDT jetton wallet(s). USDT is accepted only when the transfer arrived there. Empty = no USDT. */
+  usdtWallets: string[];
   /** Payments that arrive this long after expiry are still accepted (chain/indexer delay). */
   graceMs: number;
 }
@@ -109,6 +117,7 @@ export function matchPayments(
         const j = action.JettonTransfer;
         if (!sameAddress(j.recipient?.address, cfg.payTo)) continue;
         if (!cfg.usdtMasters.some((m) => sameAddress(m, j.jetton?.address))) continue;
+        if (!cfg.usdtWallets.some((w) => sameAddress(w, j.recipients_wallet))) continue;
         currency = 'USDT';
         amount = toBig(j.amount);
         comment = j.comment;

@@ -5,7 +5,7 @@ import { siteConfig } from '@/site.config';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'How QuickReply handles your data: snippets stay in your browser, nothing you type is collected or sent anywhere.',
+  description: 'How QuickReply handles your data: snippets stay in your browser, nothing you type is collected; only plan status is checked with our billing server.',
   alternates: { canonical: '/privacy/' },
 };
 
@@ -14,8 +14,8 @@ export default function PrivacyPage() {
     <LegalPage title="Privacy Policy" updated={siteConfig.legalUpdated}>
       <p>
         QuickReply is a Chrome extension that inserts saved text when you type a shortcut. This policy explains what data the
-        extension handles. In short: your snippets stay on your computer, and QuickReply does not collect, sell or transmit your
-        data.
+        extension handles. In short: your snippets stay on your computer and are never sent anywhere. The only thing the
+        extension sends is a random install ID, to check which plan you have.
       </p>
 
       <h2>Data stored on your device</h2>
@@ -26,8 +26,28 @@ export default function PrivacyPage() {
         <li>Local usage counts: how many times each snippet was inserted and when it was last used, to power “Recently used”.</li>
       </ul>
       <p>
-        This data never leaves your browser. QuickReply has no servers, no user accounts and no analytics. It is not synced to
+        This data never leaves your browser. QuickReply has no user accounts and no analytics. Your snippets are not synced to
         other devices unless you export a backup file and move it yourself.
+      </p>
+      <h2>Plan and payments</h2>
+      <p>
+        To know whether you have the Free plan or a paid plan, the extension creates a random install ID (not linked to your
+        name, email or browsing) and sends it to the QuickReply billing server when you open the extension settings or
+        dashboard. The server answers with your plan and its end date. If you activate a license key, the key and the install
+        ID are sent so the plan can be linked to this browser. Nothing else is sent: no snippets, no typed text, no websites
+        you visit.
+      </p>
+      <p>
+        Paid plans are bought with cryptocurrency (USDT or Toncoin on the TON blockchain). When you start a payment, our
+        server records the plan, price, currency, the install ID and a unique payment comment. Payments themselves happen in
+        your own crypto wallet; we never see or store wallet keys or card details. Like every TON transaction, your payment
+        (sender address, amount and comment) is public on the blockchain. To confirm payments, our server reads the incoming
+        transactions of our receiving wallet through TonAPI (TON Console).
+      </p>
+      <p>
+        We keep payment and license records (install IDs, license keys, plan, amounts, transaction IDs and the sender wallet
+        address) for as long as needed to provide the plan and to meet accounting obligations. The billing server runs on
+        Cloudflare.
       </p>
 
       <h2>Text you type on websites</h2>
@@ -60,12 +80,17 @@ export default function PrivacyPage() {
         <li>
           <strong>Clipboard read (optional)</strong>: only if you enable the {'{clipboard}'} variable.
         </li>
+        <li>
+          <strong>Network</strong>: only the extension’s own pages (settings and dashboard) contact the QuickReply billing server,
+          as described in “Plan and payments”. Websites you visit are never contacted on our behalf.
+        </li>
       </ul>
 
       <h2>Sharing and selling</h2>
       <p>
         QuickReply does not sell, rent or share your data with anyone, and does not use it for advertising or to determine
-        creditworthiness. No data is transferred to third parties.
+        creditworthiness. The only service providers involved are Cloudflare (hosting of this site and the billing server)
+        and TonAPI (reading public blockchain data to confirm payments).
       </p>
 
       <h2>This website</h2>
@@ -77,7 +102,8 @@ export default function PrivacyPage() {
       <h2>Deleting your data</h2>
       <p>
         Delete any snippet in the extension, or remove QuickReply from Chrome to delete all of its data from your browser. Exported
-        backup files are ordinary files on your computer that you control.
+        backup files are ordinary files on your computer that you control. To have your payment and license records deleted,
+        contact us; records we must keep for accounting are kept only as long as required.
       </p>
 
       <h2>Children</h2>

@@ -28,7 +28,7 @@ WHAT YOU CAN DO
 
 BUILT FOR PRIVACY
 • Your snippets are stored only in your browser
-• No account, no servers, no analytics
+• No account, no analytics; your snippets stay in your browser
 • Nothing you type is recorded or sent anywhere
 • Password, payment and one-time-code fields are always ignored
 

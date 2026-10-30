@@ -33,7 +33,7 @@ export const PLANS: Record<PlanId, PlanInfo> = {
     perSeat: false,
     periodDays: 0,
     devices: 1,
-    features: ['Up to 5 snippets', 'Works on every website', 'Date and time variables', 'Import and export'],
+    features: ['Up to 5 snippets', 'Works on every website', 'Variables and fill-in fields', 'Import and export'],
   },
   pro_monthly: {
     id: 'pro_monthly',
@@ -43,7 +43,7 @@ export const PLANS: Record<PlanId, PlanInfo> = {
     perSeat: false,
     periodDays: 30,
     devices: 3,
-    features: ['Unlimited snippets', 'Cloud sync', 'Multiple devices', 'Version history', 'Advanced variables'],
+    features: ['Unlimited snippets', 'One license for up to 3 browsers', 'Cloud sync (coming soon)', 'Version history (coming soon)'],
   },
   pro_annual: {
     id: 'pro_annual',
@@ -64,7 +64,7 @@ export const PLANS: Record<PlanId, PlanInfo> = {
     perSeat: true,
     periodDays: 30,
     devices: 1,
-    features: ['Shared libraries', 'Roles', 'Team folders', 'Central management'],
+    features: ['Unlimited snippets for every member', 'One license key for the team', 'Shared libraries and roles (coming soon)'],
   },
 };
 

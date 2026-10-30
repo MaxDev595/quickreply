@@ -20,7 +20,27 @@ export default function TermsPage() {
       <h2>The service</h2>
       <p>
         QuickReply lets you save text snippets and insert them into text fields on websites by typing a shortcut. The current
-        version is free to use. It runs entirely in your browser and does not require an account.
+        Free plan includes up to 5 snippets; paid plans remove the limit. It runs in your browser and does not require an
+        account.
+      </p>
+
+      <h2>Plans and payments</h2>
+      <p>
+        Paid plans (Pro and Business) are prepaid for a fixed period (30 or 365 days) and are paid in USDT or Toncoin on the
+        TON blockchain. They do not renew automatically. Buying again extends the same license. Prices are shown in US dollars;
+        a Toncoin price is calculated at the current exchange rate and must be paid within the time shown on the invoice. Send
+        the exact amount with the payment comment shown, from a wallet you control. A payment without the correct comment, for
+        a smaller amount, or in another token cannot be matched automatically; contact us with the transaction details.
+      </p>
+      <p>
+        A license key works on up to 3 browsers for Pro, and on one browser per paid seat for Business. When a plan ends, the
+        extension returns to the Free plan; your snippets are kept. Features marked “coming soon” are not part of the current
+        plan and have no promised release date.
+      </p>
+      <p>
+        Blockchain payments can’t be reversed by us. If your plan isn’t activated after a correct payment, contact us and we’ll
+        activate it or return the payment. Other refund requests are handled case by case, and where the law gives you a right
+        to a refund, we honor it.
       </p>
 
       <h2>Your content</h2>
@@ -44,8 +64,8 @@ export default function TermsPage() {
 
       <h2>Changes and availability</h2>
       <p>
-        The extension may be updated, changed or discontinued. If paid features are introduced in the future, their terms will be
-        presented before you choose to use them.
+        The extension may be updated or changed. If a paid plan is discontinued before its end date, we will return the unused
+        part of the payment.
       </p>
 
       <h2>No warranty</h2>

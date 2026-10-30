@@ -107,8 +107,38 @@ export class Billing {
     return this.env.USDT_MASTERS.split(',').map((s) => s.trim()).filter(Boolean);
   }
 
-  currencies(): PayCurrency[] {
-    return this.usdtMasters.length > 0 ? ['USDT', 'TON'] : ['TON'];
+  private usdtWalletCache: string[] | null = null;
+
+  /**
+   * Our USDT jetton wallet(s), one per allowed master, derived on-chain and cached
+   * in D1 (the address never changes). If it can't be resolved, USDT is not
+   * accepted (fail closed) until it can.
+   */
+  async usdtWallets(): Promise<string[]> {
+    if (this.usdtWalletCache) return this.usdtWalletCache;
+    const out: string[] = [];
+    for (const master of this.usdtMasters) {
+      const k = `usdt_wallet:${toRaw(master)}:${this.payTo}`;
+      const row = await this.env.DB.prepare('SELECT v FROM state WHERE k = ?').bind(k).first<{ v: string }>();
+      let w = row?.v ?? null;
+      if (!w) {
+        const found = await this.api.jettonWallet(toRaw(master), this.payTo).catch(() => null);
+        try {
+          w = found ? toRaw(found) : null;
+        } catch {
+          w = null;
+        }
+        if (w) await this.env.DB.prepare('INSERT INTO state (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v').bind(k, w).run();
+        else console.error('could not resolve our USDT jetton wallet; USDT disabled for now');
+      }
+      if (w) out.push(w);
+    }
+    if (out.length === this.usdtMasters.length && out.length > 0) this.usdtWalletCache = out;
+    return out;
+  }
+
+  async currencies(): Promise<PayCurrency[]> {
+    return this.usdtMasters.length > 0 && (await this.usdtWallets()).length > 0 ? ['USDT', 'TON'] : ['TON'];
   }
 
   private divisor(): number {
@@ -147,7 +177,7 @@ export class Billing {
     if (!Number.isInteger(seats) || seats < 1 || seats > MAX_SEATS) throw new HttpError(400, `Seats must be 1–${MAX_SEATS}`);
     const currency = input.currency;
     if (currency !== 'USDT' && currency !== 'TON') throw new HttpError(400, 'Unknown currency');
-    if (!this.currencies().includes(currency)) throw new HttpError(400, `${currency} is not accepted in this mode`);
+    if (!(await this.currencies()).includes(currency)) throw new HttpError(400, `${currency} is not accepted right now`);
 
     const pending = await this.env.DB.prepare(
       "SELECT COUNT(*) AS n FROM invoices WHERE install_id = ? AND status = 'pending' AND expires_at > ?",
@@ -244,6 +274,7 @@ export class Billing {
     const matches = matchPayments(events, invoices, new Set(seen.results.map((r) => r.event_id)), {
       payTo: this.payTo,
       usdtMasters: this.usdtMasters,
+      usdtWallets: invoices.some((i) => i.currency === 'USDT') ? await this.usdtWallets() : [],
       graceMs: GRACE_MS,
     });
     let settled = 0;
@@ -355,7 +386,7 @@ export class Billing {
     return {
       testMode: this.testMode,
       network: this.testMode ? 'testnet' : 'mainnet',
-      currencies: this.currencies(),
+      currencies: await this.currencies(),
       priceDivisor: this.divisor(),
       payTo: toFriendly(this.payTo, { bounceable: false, testnet: this.testMode }),
     };

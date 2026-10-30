@@ -95,7 +95,9 @@ describe('payment matching', () => {
     ],
     ...over,
   });
-  const usdtEvent = (master: string, amount = '3990000', comment = 'QR-USDT2345'): TonApiEvent => ({
+  const OUR_JW = '0:' + 'a'.repeat(64);
+  const FAKE_JW = '0:' + 'b'.repeat(64);
+  const usdtEvent = (master: string, amount = '3990000', comment = 'QR-USDT2345', recipientsWallet = OUR_JW): TonApiEvent => ({
     event_id: `ev-usdt-${master.slice(-4)}-${amount}`,
     timestamp: Math.floor((t0 + 60_000) / 1000),
     lt: 200,
@@ -107,6 +109,7 @@ describe('payment matching', () => {
         JettonTransfer: {
           sender: { address: PAYER },
           recipient: { address: WALLET_RAW },
+          recipients_wallet: recipientsWallet,
           amount,
           comment,
           jetton: { address: master, symbol: 'USD₮', decimals: 6 },
@@ -114,7 +117,7 @@ describe('payment matching', () => {
       },
     ],
   });
-  const cfg = { payTo: WALLET, usdtMasters: [USDT], graceMs: 1_800_000 };
+  const cfg = { payTo: WALLET, usdtMasters: [USDT], usdtWallets: [OUR_JW], graceMs: 1_800_000 };
   const usdtInv = inv({ id: 'inv-u', comment: 'QR-USDT2345', currency: 'USDT', amount: 3_990_000n });
 
   it('settles an exact TON payment with the right comment', () => {
@@ -151,6 +154,17 @@ describe('payment matching', () => {
     expect(matchPayments([usdtEvent(toRaw(USDT).toUpperCase())], [usdtInv], new Set(), cfg)).toHaveLength(1);
     expect(matchPayments([usdtEvent(FAKE_MASTER)], [usdtInv], new Set(), cfg)).toEqual([]);
     expect(matchPayments([usdtEvent(toRaw(USDT), '3989999')], [usdtInv], new Set(), cfg)).toEqual([]);
+  });
+
+  it('rejects a token that claims the real USDT master but did not arrive through our USDT wallet', () => {
+    expect(matchPayments([usdtEvent(toRaw(USDT), '3990000', 'QR-USDT2345', FAKE_JW)], [usdtInv], new Set(), cfg)).toEqual([]);
+    const noWallet = usdtEvent(toRaw(USDT));
+    delete noWallet.actions[0]!.JettonTransfer!.recipients_wallet;
+    expect(matchPayments([noWallet], [usdtInv], new Set(), cfg)).toEqual([]);
+  });
+
+  it('accepts no USDT at all while our USDT wallet is unknown (fail closed)', () => {
+    expect(matchPayments([usdtEvent(toRaw(USDT))], [usdtInv], new Set(), { ...cfg, usdtWallets: [] })).toEqual([]);
   });
 
   it('pays an invoice only once even if two transfers carry its comment', () => {

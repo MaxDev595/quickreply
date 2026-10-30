@@ -1,14 +1,16 @@
 /**
- * Plan status for this browser. Only active in builds made with VITE_BILLING_API.
- * Builds without it have no plans and no limits.
+ * Plan status for this browser, from the billing API (PRODUCTION.billingApi, or
+ * VITE_BILLING_API). Builds without an API have no plans and no limits.
  *
  * The extension never decides entitlements itself: it asks the billing API,
  * which settles on-chain payments and returns the current plan.
  */
-import { snippetLimit, type Entitlement } from '@quickreply/shared';
+import { PRODUCTION, snippetLimit, type Entitlement } from '@quickreply/shared';
 
-export const BILLING_API: string = import.meta.env.VITE_BILLING_API ?? '';
-export const SITE_URL: string = import.meta.env.VITE_SITE_URL ?? 'http://localhost:3000';
+const billingEnv = import.meta.env.VITE_BILLING_API;
+/** VITE_BILLING_API overrides the production API; "off" builds without plans or limits (tests). */
+export const BILLING_API: string = billingEnv === 'off' ? '' : billingEnv || PRODUCTION.billingApi;
+export const SITE_URL: string = import.meta.env.VITE_SITE_URL || PRODUCTION.siteUrl;
 export const billingEnabled = BILLING_API.length > 0;
 
 const INSTALL_KEY = 'qr.installId';

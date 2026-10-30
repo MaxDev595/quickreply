@@ -16,3 +16,5 @@ qa/pages/react-app.js
 dist-testnet/
 
 .fixtures-build/
+dist-local/
+wrangler.production.toml
