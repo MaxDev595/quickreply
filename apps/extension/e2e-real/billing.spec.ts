@@ -115,6 +115,63 @@ async function invoiceFromPage(page: Page) {
   return { comment, amountText };
 }
 
+
+async function seedSnippets(page: Page, n: number) {
+  await page.evaluate(async (count) => {
+    const now = Date.now();
+    const snippets = Array.from({ length: count }, (_, i) => ({
+      id: `seed-${i}`, name: `Seed ${i}`, shortcut: `/seed${i}`, content: `Seed text ${i}`,
+      folderId: null, favorite: false, enabled: true, createdAt: now, updatedAt: now,
+    }));
+    await chrome.storage.local.set({ 'qr.snippets': snippets, 'qr.folders': [], 'qr.schemaVersion': 1 });
+  }, n);
+}
+
+test('Free plan: 5 snippets max, the 6th asks to upgrade, nothing is lost', async () => {
+  test.setTimeout(60_000);
+  const { context, id } = await launchExt();
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${id}/dashboard.html#/settings`);
+  await seedSnippets(page, 4);
+  await page.reload();
+  await expect(page.getByTestId('snippet-usage')).toHaveText('4 of 5 snippets used');
+
+  // 5th snippet is fine
+  await page.goto(`chrome-extension://${id}/dashboard.html#/all?s=seed-0`);
+  await page.getByRole('button', { name: 'Duplicate' }).click();
+  await expect(page.getByText('Snippet duplicated')).toBeVisible();
+
+  // 6th is blocked with an upgrade dialog
+  await page.goto(`chrome-extension://${id}/dashboard.html#/all?s=seed-1`);
+  await page.getByRole('button', { name: 'Duplicate' }).click();
+  const dialog = page.getByRole('alertdialog');
+  await expect(dialog).toContainText('The Free plan includes up to 5 snippets');
+  const count = await page.evaluate(async () => ((await chrome.storage.local.get('qr.snippets'))['qr.snippets'] as unknown[]).length);
+  expect(count).toBe(5);
+  const checkoutPromise = context.waitForEvent('page');
+  await dialog.getByRole('button', { name: 'Upgrade to Pro' }).click();
+  const checkout = await checkoutPromise;
+  await checkout.waitForLoadState();
+  expect(checkout.url()).toMatch(/\/pricing\/\?install=/);
+
+  // A new snippet from the editor is blocked too, and the typed text stays in the editor
+  await page.bringToFront();
+  await page.goto(`chrome-extension://${id}/dashboard.html#/all?new=1`);
+  await page.getByLabel('Name').fill('Sixth');
+  await page.getByLabel('Shortcut').fill('/sixth');
+  await page.locator('#qr-content').fill('Hello');
+  await page.getByRole('button', { name: 'Create snippet' }).click();
+  await expect(page.getByRole('alertdialog')).toBeVisible();
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.getByLabel('Name')).toHaveValue('Sixth');
+
+  // Libraries already over the limit (e.g. from before limits) keep working and can be edited
+  await seedSnippets(page, 9);
+  await page.goto(`chrome-extension://${id}/dashboard.html#/settings`);
+  await expect(page.getByTestId('snippet-usage')).toContainText('9 of 5 snippets used');
+  await context.close();
+});
+
 let businessKey = '';
 
 test('Pro Annual: Upgrade from the extension → pay USDT → plan active in the extension', async () => {
@@ -157,7 +214,15 @@ test('Pro Annual: Upgrade from the extension → pay USDT → plan active in the
   await settings.getByRole('button', { name: 'Refresh plan' }).click();
   await expect(settings.getByTestId('current-plan')).toHaveText('Pro Annual');
   await expect(settings.getByText(/Active until/)).toBeVisible();
+  await expect(settings.getByText(/unlimited snippets/)).toBeVisible();
   await settings.screenshot({ path: join(ROOT, 'docs/screenshots/extension-plan-pro.png') });
+
+  // Pro: no snippet limit
+  await seedSnippets(settings, 5);
+  await settings.goto(`chrome-extension://${id}/dashboard.html#/all?s=seed-0`);
+  await settings.getByRole('button', { name: 'Duplicate' }).click();
+  await expect(settings.getByText('Snippet duplicated')).toBeVisible();
+  await expect(settings.getByRole('alertdialog')).toHaveCount(0);
   await context.close();
 });
 

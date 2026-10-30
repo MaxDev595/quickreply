@@ -11,6 +11,7 @@ import { GET_PAGE_INFO, isPageInfo } from '../lib/messages';
 import { updateSettings, type AppState } from '../lib/storage';
 import { addSnippet, copySnippet, deleteSnippet, duplicateSnippet, openDashboard, saveSnippet } from '../ui/actions';
 import { ConfirmDialog, IconButton, Keycap, Logo, Menu, Toggle, cx, useToast } from '../ui/components';
+import { useLimitGuard } from '../ui/limit';
 import { exampleSnippets } from '../ui/examples';
 import { useAppState } from '../ui/useAppState';
 
@@ -47,6 +48,7 @@ function PopupView({ state }: { state: AppState }) {
   const [query, setQuery] = useState('');
   const [pendingDelete, setPendingDelete] = useState<Snippet | null>(null);
   const [toast, showToast] = useToast();
+  const [limitDialog, guard] = useLimitGuard();
   const host = useActiveHostname();
 
   const list = useMemo(() => sortSnippets(filterSnippets(snippets, query), 'most-used', usage), [snippets, query, usage]);
@@ -130,12 +132,14 @@ function PopupView({ state }: { state: AppState }) {
           <EmptyState
             prefix={settings.defaultPrefix}
             onCreate={newSnippet}
-            onExamples={async () => {
-              for (const draft of exampleSnippets(settings.defaultPrefix || '/')) {
-                if (!snippets.some((s) => s.shortcut === draft.shortcut)) await addSnippet(draft);
-              }
-              showToast('Example snippets added');
-            }}
+            onExamples={() =>
+              guard(async () => {
+                for (const draft of exampleSnippets(settings.defaultPrefix || '/')) {
+                  if (!snippets.some((s) => s.shortcut === draft.shortcut)) await addSnippet(draft);
+                }
+                showToast('Example snippets added');
+              })
+            }
           />
         ) : list.length === 0 ? (
           <p className="px-2 py-10 text-center text-[13px] text-muted">No snippets match “{query}”.</p>
@@ -147,7 +151,12 @@ function PopupView({ state }: { state: AppState }) {
                 snippet={s}
                 onCopy={async () => showToast((await copySnippet(s)) ? 'Copied to clipboard' : 'Copy failed')}
                 onDelete={() => setPendingDelete(s)}
-                onToast={showToast}
+                onDuplicate={() =>
+                  guard(async () => {
+                    await duplicateSnippet(s.id);
+                    showToast('Snippet duplicated');
+                  })
+                }
               />
             ))}
           </ul>
@@ -195,6 +204,7 @@ function PopupView({ state }: { state: AppState }) {
         />
       )}
       {toast}
+      {limitDialog}
     </div>
   );
 }
@@ -203,12 +213,12 @@ function SnippetRow({
   snippet,
   onCopy,
   onDelete,
-  onToast,
+  onDuplicate,
 }: {
   snippet: Snippet;
   onCopy: () => void;
   onDelete: () => void;
-  onToast: (m: string) => void;
+  onDuplicate: () => void;
 }) {
   const edit = () => {
     openDashboard(`#/all?s=${encodeURIComponent(snippet.id)}`);
@@ -242,10 +252,7 @@ function SnippetRow({
             {
               label: 'Duplicate',
               icon: <CopyPlus size={14} />,
-              onSelect: async () => {
-                await duplicateSnippet(snippet.id);
-                onToast('Snippet duplicated');
-              },
+              onSelect: onDuplicate,
             },
             {
               label: snippet.favorite ? 'Remove from favorites' : 'Add to favorites',

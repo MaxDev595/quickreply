@@ -18,6 +18,7 @@ import { billingEnabled } from '../lib/billing';
 import { updateLibrary, updateSettings, type AppState } from '../lib/storage';
 import { PlanSection } from './PlanSection';
 import { Button, ConfirmDialog, Toggle, cx, inputBase, inputClass } from '../ui/components';
+import { useLimitGuard } from '../ui/limit';
 
 function Section({ title, description, children }: { title: string; description?: ReactNode; children: ReactNode }) {
   return (
@@ -83,6 +84,7 @@ type PendingImport = { mode: 'merge' | 'restore'; parsed: ParsedImport; fileName
 
 export function SettingsView({ state, onToast }: { state: AppState; onToast: (m: string) => void }) {
   const { settings, snippets, folders } = state;
+  const [limitDialog, guard] = useLimitGuard();
   const [site, setSite] = useState('');
   const [siteError, setSiteError] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -141,12 +143,15 @@ export function SettingsView({ state, onToast }: { state: AppState; onToast: (m:
     if (!pending) return;
     const { parsed, mode } = pending;
     const result: { report?: MergeReport } = {};
-    await updateLibrary((lib) => {
-      const merged = mode === 'restore' ? replaceWithImport(parsed.data) : mergeImport(lib, parsed.data, strategy);
-      result.report = merged.report;
-      return merged.data;
-    });
     setPending(null);
+    const done = await guard(() =>
+      updateLibrary((lib) => {
+        const merged = mode === 'restore' ? replaceWithImport(parsed.data) : mergeImport(lib, parsed.data, strategy);
+        result.report = merged.report;
+        return merged.data;
+      }),
+    );
+    if (!done) return;
     const r = result.report;
     onToast(
       mode === 'restore'
@@ -164,7 +169,7 @@ export function SettingsView({ state, onToast }: { state: AppState; onToast: (m:
 
         {billingEnabled && (
           <Section title="Plan" description="Your plan is checked with the QuickReply billing server.">
-            <PlanSection onToast={onToast} />
+            <PlanSection onToast={onToast} snippetCount={snippets.length} />
           </Section>
         )}
 
@@ -341,6 +346,7 @@ export function SettingsView({ state, onToast }: { state: AppState; onToast: (m:
           }
         />
       )}
+      {limitDialog}
     </div>
   );
 }

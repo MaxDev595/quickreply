@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "wrangler d1 migrations apply quickreply-billing --local && wrangler dev --port 8787",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run",
+    "test": "vitest run test/",
     "deploy": "wrangler d1 migrations apply quickreply-billing --remote && wrangler deploy",
     "test:int": "node --test --test-force-exit test-int/flow.test.mjs",
     "pretest:int": "node -e \"require('fs').rmSync('.wrangler/int-state',{recursive:true,force:true})\" && wrangler d1 migrations apply quickreply-billing --local --persist-to .wrangler/int-state"

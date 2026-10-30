@@ -2,12 +2,14 @@ import {
   DEFAULT_SETTINGS,
   SCHEMA_VERSION,
   STORAGE_KEYS,
+  withinSnippetLimit,
   type Folder,
   type LibraryData,
   type Settings,
   type Snippet,
   type UsageStats,
 } from '@quickreply/shared';
+import { currentSnippetLimit } from './billing';
 
 export interface AppState {
   snippets: Snippet[];
@@ -50,6 +52,17 @@ export async function loadState(): Promise<AppState> {
   };
 }
 
+/** Thrown when a change would grow a Free library past its snippet limit. */
+export class SnippetLimitError extends Error {
+  constructor(
+    readonly limit: number,
+    readonly current: number,
+  ) {
+    super(`The Free plan includes up to ${limit} snippets.`);
+    this.name = 'SnippetLimitError';
+  }
+}
+
 /**
  * Read-modify-write on the latest stored library, so two open extension pages
  * (popup + dashboard) don't overwrite each other's edits with stale copies.
@@ -57,6 +70,10 @@ export async function loadState(): Promise<AppState> {
 export async function updateLibrary(fn: (lib: LibraryData) => LibraryData): Promise<LibraryData> {
   const { snippets, folders } = await loadState();
   const next = fn({ snippets, folders });
+  if (next.snippets.length > snippets.length) {
+    const limit = await currentSnippetLimit();
+    if (!withinSnippetLimit(snippets.length, next.snippets.length, limit)) throw new SnippetLimitError(limit, snippets.length);
+  }
   await area().set({
     [STORAGE_KEYS.snippets]: next.snippets,
     [STORAGE_KEYS.folders]: next.folders,

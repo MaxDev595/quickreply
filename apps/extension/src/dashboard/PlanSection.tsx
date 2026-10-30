@@ -1,11 +1,11 @@
-import { PLANS, type Entitlement } from '@quickreply/shared';
+import { FREE_SNIPPET_LIMIT, PLANS, hasPaidAccess, type Entitlement } from '@quickreply/shared';
 import { ExternalLink, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { activateLicense, cachedEntitlement, checkoutUrl, refreshEntitlement } from '../lib/billing';
+import { activateLicense, cachedEntitlement, openCheckout, refreshEntitlement } from '../lib/billing';
 import { Button, inputClass } from '../ui/components';
 
 /** Plan & billing (test-mode builds only). */
-export function PlanSection({ onToast }: { onToast: (m: string) => void }) {
+export function PlanSection({ onToast, snippetCount }: { onToast: (m: string) => void; snippetCount: number }) {
   const [ent, setEnt] = useState<Entitlement | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export function PlanSection({ onToast }: { onToast: (m: string) => void }) {
     }
   };
 
-  const paid = ent && ent.tier !== 'free';
+  const paid = ent && hasPaidAccess(ent);
   return (
     <div className="flex flex-col gap-4">
       {ent?.testMode && (
@@ -57,11 +57,18 @@ export function PlanSection({ onToast }: { onToast: (m: string) => void }) {
       <div className="flex items-center justify-between gap-4 rounded-lg border border-line p-4">
         <div>
           <div className="text-[14px] font-semibold" data-testid="current-plan">
-            {ent ? PLANS[ent.plan].name : 'Free'}
+            {paid ? PLANS[ent.plan].name : 'Free'}
             {paid && ent.seats > 1 ? ` · ${ent.seats} seats` : ''}
           </div>
           <div className="mt-0.5 text-[12px] text-muted">
-            {paid && ent.expiresAt ? `Active until ${new Date(ent.expiresAt).toLocaleDateString()}` : 'All local features, no limits.'}
+            {paid && ent.expiresAt ? (
+              `Active until ${new Date(ent.expiresAt).toLocaleDateString()} · unlimited snippets`
+            ) : (
+              <span data-testid="snippet-usage">
+                {snippetCount} of {FREE_SNIPPET_LIMIT} snippets used
+                {snippetCount >= FREE_SNIPPET_LIMIT ? ' · upgrade for unlimited snippets' : ''}
+              </span>
+            )}
           </div>
           {paid && ent.licenseKey && <div className="mt-1 font-mono text-[12px] text-muted">{ent.licenseKey}</div>}
         </div>
@@ -72,10 +79,7 @@ export function PlanSection({ onToast }: { onToast: (m: string) => void }) {
           <Button
             size="sm"
             variant="primary"
-            onClick={async () => {
-              const url = await checkoutUrl();
-              chrome.tabs.create({ url }).catch(() => window.open(url, '_blank'));
-            }}
+            onClick={() => void openCheckout()}
           >
             {paid ? 'Extend or change plan' : 'Upgrade'} <ExternalLink size={13} />
           </Button>

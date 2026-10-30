@@ -42,7 +42,7 @@ const FEATURES = [
 const FAQ = [
   {
     q: 'Is QuickReply free?',
-    a: 'Yes. The current version is completely free, with no account and no limit on the number of snippets.',
+    a: 'Yes, the Free plan needs no account and includes up to 5 snippets that work on every website. Pro removes the limit and adds cloud sync.',
   },
   {
     q: 'How does text expansion work?',

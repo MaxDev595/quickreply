@@ -1,3 +1,4 @@
+import { FREE_SNIPPET_LIMIT, hasPaidAccess, snippetLimit, withinSnippetLimit } from '../src/billing';
 import { describe, expect, it } from 'vitest';
 import { isSiteExcluded, normalizeSiteInput } from '../src/sites';
 import { uniqueShortcut, validateShortcut } from '../src/shortcut';
@@ -70,5 +71,27 @@ describe('library helpers', () => {
   it('builds previews', () => {
     expect(previewText('a\n\nb   c')).toBe('a b c');
     expect(previewText('x'.repeat(100), 10)).toHaveLength(10);
+  });
+});
+
+describe('snippet limit', () => {
+  const base = { plan: 'pro_monthly' as const, seats: 1, licenseKey: 'k', testMode: true };
+  it('free and missing entitlements get 5', () => {
+    expect(FREE_SNIPPET_LIMIT).toBe(5);
+    expect(snippetLimit(null)).toBe(5);
+    expect(snippetLimit({ ...base, tier: 'free', plan: 'free', expiresAt: null })).toBe(5);
+  });
+  it('active paid plans are unlimited, expired ones fall back to Free', () => {
+    expect(snippetLimit({ ...base, tier: 'pro', expiresAt: 2000 }, 1000)).toBe(Infinity);
+    expect(hasPaidAccess({ ...base, tier: 'pro', expiresAt: 500 }, 1000)).toBe(false);
+    expect(snippetLimit({ ...base, tier: 'business', expiresAt: 500 }, 1000)).toBe(5);
+  });
+  it('blocks growth past the limit but keeps existing larger libraries', () => {
+    expect(withinSnippetLimit(4, 5, 5)).toBe(true);
+    expect(withinSnippetLimit(5, 6, 5)).toBe(false);
+    expect(withinSnippetLimit(12, 12, 5)).toBe(true);
+    expect(withinSnippetLimit(12, 11, 5)).toBe(true);
+    expect(withinSnippetLimit(12, 13, 5)).toBe(false);
+    expect(withinSnippetLimit(0, 40, Infinity)).toBe(true);
   });
 });

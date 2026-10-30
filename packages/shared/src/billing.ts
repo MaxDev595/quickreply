@@ -33,7 +33,7 @@ export const PLANS: Record<PlanId, PlanInfo> = {
     perSeat: false,
     periodDays: 0,
     devices: 1,
-    features: ['All local features', 'Unlimited snippets', 'No artificial limits'],
+    features: ['Up to 5 snippets', 'Works on every website', 'Date and time variables', 'Import and export'],
   },
   pro_monthly: {
     id: 'pro_monthly',
@@ -43,7 +43,7 @@ export const PLANS: Record<PlanId, PlanInfo> = {
     perSeat: false,
     periodDays: 30,
     devices: 3,
-    features: ['Cloud sync', 'Multiple devices', 'Version history', 'Advanced variables'],
+    features: ['Unlimited snippets', 'Cloud sync', 'Multiple devices', 'Version history', 'Advanced variables'],
   },
   pro_annual: {
     id: 'pro_annual',
@@ -70,6 +70,28 @@ export const PLANS: Record<PlanId, PlanInfo> = {
 
 export const PAID_PLANS: PaidPlanId[] = ['pro_monthly', 'pro_annual', 'business_monthly'];
 export const MAX_SEATS = 500;
+
+/** Snippets a Free library can grow to. Existing snippets over the limit keep working. */
+export const FREE_SNIPPET_LIMIT = 5;
+
+/** Paid entitlement that hasn't expired yet. */
+export function hasPaidAccess(ent: Entitlement | null | undefined, now = Date.now()): boolean {
+  return !!ent && ent.tier !== 'free' && (ent.expiresAt === null || ent.expiresAt > now);
+}
+
+/** Maximum number of snippets for this entitlement (Infinity for paid plans). */
+export function snippetLimit(ent: Entitlement | null | undefined, now = Date.now()): number {
+  return hasPaidAccess(ent, now) ? Infinity : FREE_SNIPPET_LIMIT;
+}
+
+/**
+ * Whether a library change from `before` to `after` snippets is allowed under `limit`.
+ * Growing past the limit is blocked; libraries already over it (made before limits
+ * existed, or after a plan ran out) are kept and may shrink or be edited.
+ */
+export function withinSnippetLimit(before: number, after: number, limit: number): boolean {
+  return after <= limit || after <= before;
+}
 
 export function isPaidPlan(id: unknown): id is PaidPlanId {
   return typeof id === 'string' && (PAID_PLANS as string[]).includes(id);

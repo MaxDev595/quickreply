@@ -37,7 +37,7 @@ GOOD TO KNOW
 • Similar shortcuts like /hi and /hire never collide: the shorter one waits for a space.
 • If a site already uses / for its own commands, choose ; as your prefix in Settings.
 
-QuickReply is free. Chrome is a trademark of Google LLC.
+QuickReply is free for up to 5 snippets; Pro removes the limit. Chrome is a trademark of Google LLC.
 
 ## Keywords to use naturally (no keyword stuffing)
 

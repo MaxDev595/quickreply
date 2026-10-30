@@ -12,7 +12,7 @@
 | `shortcut.ts` | Shortcut validation and unique-name generation |
 | `importExport.ts` | Backup format, defensive parsing of untrusted files, merge/restore with conflict strategies |
 | `sites.ts` | Normalizes site input, matches excluded hosts incl. subdomains |
-| `plans.ts` | `PlanLimits` placeholder (v1 is free and unlimited; no client-side paywall) |
+| `billing.ts` | Plans, prices, `FREE_SNIPPET_LIMIT` (5) and limit checks shared by the extension, site and API |
 
 **`apps/extension`**
 

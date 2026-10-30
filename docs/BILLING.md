@@ -6,12 +6,20 @@ Status: **test mode only** (TON testnet). Paid features (sync, version history, 
 
 | Plan | Price | Period | Devices |
 |---|---|---|---|
-| Free | $0 | — | all local features, no limits |
+| Free | $0 | — | up to 5 snippets (`FREE_SNIPPET_LIMIT`), all expansion features |
 | Pro Monthly | $3.99 | 30 days | 3 |
 | Pro Annual | $29 | 365 days (recommended) | 3 |
 | Business | $7.99 per user | 30 days | 1 per seat |
 
 Defined once in `packages/shared/src/billing.ts` and used by the API, the website and the extension.
+
+## Free limit: 5 snippets
+
+- Enforced in one place, `updateLibrary()` in `apps/extension/src/lib/storage.ts`: any change that would grow the library past the limit (new snippet, duplicate, examples, import, restore) throws `SnippetLimitError`, and the UI shows an "Upgrade to Pro" dialog. Nothing is saved in that case; text typed in the editor stays.
+- Expansion is never limited: every saved snippet keeps working, however many times it's used.
+- Libraries already over the limit (created before limits, or after a paid plan ran out) are kept: those snippets keep working and can be edited or deleted, only adding is blocked.
+- The plan comes from the server; the extension uses the last confirmed plan, so it works offline. An expired plan falls back to Free.
+- Applies only in builds with `VITE_BILLING_API`. A build without it has no plans and no limit, so build the launch version with the production API URL.
 
 ## How a payment works
 

@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import type { AppState } from '../lib/storage';
 import { addSnippet, deleteSnippet, duplicateSnippet, saveSnippet } from '../ui/actions';
 import { Button, ConfirmDialog, Keycap, cx, inputBase, inputClass, useToast } from '../ui/components';
+import { useLimitGuard } from '../ui/limit';
 import { exampleSnippets } from '../ui/examples';
 import { useAppState } from '../ui/useAppState';
 import { useRoute, type Route, type View } from './route';
@@ -59,6 +60,7 @@ function DashboardView({ state }: { state: AppState }) {
   const [pendingRoute, setPendingRoute] = useState<Route | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Snippet | null>(null);
   const [toast, showToast] = useToast();
+  const [limitDialog, guard] = useLimitGuard();
   const narrow = useNarrow();
   const { view, selected } = route;
 
@@ -132,7 +134,8 @@ function DashboardView({ state }: { state: AppState }) {
 
   const onSave = async (draft: Draft) => {
     if (selected === 'new') {
-      const created = await addSnippet(draft);
+      const created = await guard(() => addSnippet(draft));
+      if (!created) return;
       setDirty(false);
       navigate({ view, selected: created.id });
       showToast('Snippet created');
@@ -188,12 +191,14 @@ function DashboardView({ state }: { state: AppState }) {
             hasAny={snippets.length > 0}
             query={query}
             onNew={() => go({ view, selected: 'new' })}
-            onExamples={async () => {
-              for (const d of exampleSnippets(settings.defaultPrefix || '/')) {
-                if (!snippets.some((s) => s.shortcut === d.shortcut)) await addSnippet(d);
-              }
-              showToast('Example snippets added');
-            }}
+            onExamples={() =>
+              guard(async () => {
+                for (const d of exampleSnippets(settings.defaultPrefix || '/')) {
+                  if (!snippets.some((s) => s.shortcut === d.shortcut)) await addSnippet(d);
+                }
+                showToast('Example snippets added');
+              })
+            }
           />
         ) : (
           <ul aria-label="Snippets" className="flex flex-col gap-0.5">
@@ -237,8 +242,9 @@ function DashboardView({ state }: { state: AppState }) {
       onDelete={() => current && setPendingDelete(current)}
       onDuplicate={async () => {
         if (!current) return;
-        const copy = await duplicateSnippet(current.id);
-        if (copy) navigate({ view, selected: copy.id });
+        const copy = await guard(() => duplicateSnippet(current.id));
+        if (!copy) return;
+        navigate({ view, selected: copy.id });
         showToast('Snippet duplicated');
       }}
       onBack={narrow ? () => go({ view, selected: null }) : undefined}
@@ -296,6 +302,7 @@ function DashboardView({ state }: { state: AppState }) {
         />
       )}
       {toast}
+      {limitDialog}
     </Shell>
   );
 }
