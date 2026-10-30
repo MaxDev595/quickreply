@@ -6,5 +6,5 @@
  */
 export const PRODUCTION = {
   siteUrl: 'https://quickreply-6fj.pages.dev',
-  billingApi: '',
+  billingApi: 'https://quickreply-billing.lemiri-ai.workers.dev',
 } as const;
