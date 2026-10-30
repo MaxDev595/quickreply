@@ -13,8 +13,9 @@ export default function ContactPage() {
     <LegalPage title="Contact">
       {siteConfig.contactEmail ? (
         <p>
-          For questions, feedback or privacy requests, email{' '}
-          <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.
+          For questions, payments and licenses, feedback or privacy requests, email{' '}
+          <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>. For a payment, include the payment
+          comment (QR-…) or your license key.
         </p>
       ) : (
         <p>A support email address will be published here when QuickReply launches in the Chrome Web Store.</p>

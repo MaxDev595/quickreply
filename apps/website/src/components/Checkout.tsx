@@ -385,6 +385,15 @@ export function Checkout() {
               <div aria-live="polite" className="mt-4 flex items-center gap-2 text-[13px] text-muted">
                 <Loader2 size={14} className="animate-spin" /> Waiting for payment… This page updates by itself.
               </div>
+              {siteConfig.contactEmail && (
+                <p className="mt-3 text-[12px] text-muted">
+                  Paid but nothing happened after 30 minutes? Email{' '}
+                  <a className="underline" href={`mailto:${siteConfig.contactEmail}?subject=Payment%20${invoice.comment}`}>
+                    {siteConfig.contactEmail}
+                  </a>{' '}
+                  with the comment {invoice.comment}.
+                </p>
+              )}
             </div>
           )}
         </aside>

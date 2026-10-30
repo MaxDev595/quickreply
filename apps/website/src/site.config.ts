@@ -17,7 +17,7 @@ export const siteConfig = {
     'QuickReply is a Chrome text expander. Save the messages you type every day and insert them anywhere with short shortcuts like /hello.',
   siteUrl: process.env.SITE_URL ?? PRODUCTION.siteUrl,
   chromeStoreUrl: process.env.NEXT_PUBLIC_CHROME_STORE_URL ?? '',
-  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? '',
+  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'quickreply143@gmail.com',
   /** Billing API base URL. Empty = paid plans are shown as "Coming soon" with no checkout. */
   billingApi: billingEnv === 'off' ? '' : billingEnv || PRODUCTION.billingApi,
   /** Last update of the Privacy Policy and Terms. */
