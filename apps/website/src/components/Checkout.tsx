@@ -260,7 +260,7 @@ export function Checkout() {
                       className={`rounded-lg border px-3 py-2.5 text-left text-[14px] disabled:opacity-40 ${currency === c ? 'border-accent bg-accent-soft font-semibold' : 'border-line'}`}
                     >
                       {c === 'USDT' ? 'USDT (TON)' : 'Toncoin'}
-                      {!available && <span className="block text-[11px] font-normal text-muted">Not in test mode</span>}
+                      {config && !available && <span className="block text-[11px] font-normal text-muted">Unavailable right now</span>}
                     </button>
                   );
                 })}
