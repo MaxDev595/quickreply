@@ -1,0 +1,28 @@
+name = "quickreply-billing"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Scan the receiving wallet for payments every minute.
+[triggers]
+crons = ["* * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "quickreply-billing"
+# Set the real id after `wrangler d1 create quickreply-billing` (local dev works without it).
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[vars]
+# TEST MODE: TON testnet. Switch to "mainnet" only for real payments.
+TON_NETWORK = "testnet"
+# Receiving wallet (public address, safe to commit). Replace with your own.
+PAY_TO = "UQDAN7augBPM8Vtpcxl5fVa_Zw33vTA0FfuIOlJh5TCT6_sS"
+# USDT jetton master allowlist. Mainnet USDT: EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs
+# There is no official USDT on testnet, so test mode accepts TON only.
+USDT_MASTERS = ""
+# Testnet faucets give little TON: invoices are divided by this in test mode.
+TEST_PRICE_DIVISOR = "100"
+ALLOWED_ORIGINS = "http://localhost:3000,chrome-extension://*"
+
+# Secret (never commit): wrangler secret put TONAPI_KEY  — locally: apps/api/.dev.vars

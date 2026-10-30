@@ -1,0 +1,85 @@
+{
+  "format": "quickreply-backup",
+  "version": 1,
+  "exportedAt": "2026-10-29T13:45:26Z",
+  "folders": [],
+  "snippets": [
+    {
+      "id": "qa-1",
+      "name": "Hello",
+      "shortcut": "/hello",
+      "content": "Hello! Thank you for contacting us. How can I help you today?",
+      "folderId": null,
+      "favorite": false,
+      "enabled": true,
+      "createdAt": 1793281526704,
+      "updatedAt": 1793281526704
+    },
+    {
+      "id": "qa-2",
+      "name": "Multi",
+      "shortcut": "/multi",
+      "content": "Hi there,\n\nThanks for reaching out.\nBest regards",
+      "folderId": null,
+      "favorite": false,
+      "enabled": true,
+      "createdAt": 1793281526704,
+      "updatedAt": 1793281526704
+    },
+    {
+      "id": "qa-3",
+      "name": "Hi",
+      "shortcut": "/hi",
+      "content": "Hi!",
+      "folderId": null,
+      "favorite": false,
+      "enabled": true,
+      "createdAt": 1793281526704,
+      "updatedAt": 1793281526704
+    },
+    {
+      "id": "qa-4",
+      "name": "Hire",
+      "shortcut": "/hire",
+      "content": "We are hiring.",
+      "folderId": null,
+      "favorite": false,
+      "enabled": true,
+      "createdAt": 1793281526704,
+      "updatedAt": 1793281526704
+    },
+    {
+      "id": "qa-5",
+      "name": "Greet",
+      "shortcut": "/greet",
+      "content": "Hello {name}, from {company}!",
+      "folderId": null,
+      "favorite": false,
+      "enabled": true,
+      "createdAt": 1793281526704,
+      "updatedAt": 1793281526704
+    },
+    {
+      "id": "qa-6",
+      "name": "Today",
+      "shortcut": "/today",
+      "content": "Date: {date} {time}",
+      "folderId": null,
+      "favorite": false,
+      "enabled": true,
+      "createdAt": 1793281526704,
+      "updatedAt": 1793281526704
+    },
+    {
+      "id": "qa-7",
+      "name": "Clip",
+      "shortcut": "/clip",
+      "content": "Copied: {clipboard}",
+      "folderId": null,
+      "favorite": false,
+      "enabled": true,
+      "createdAt": 1793281526704,
+      "updatedAt": 1793281526704
+    }
+  ]
+}

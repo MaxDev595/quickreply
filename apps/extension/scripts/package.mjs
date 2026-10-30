@@ -4,10 +4,11 @@ import { mkdir, readFile, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
-const dist = resolve(root, 'dist');
+const dist = resolve(root, process.env.QR_OUT_DIR ?? 'dist');
 const { version } = JSON.parse(await readFile(resolve(dist, 'manifest.json'), 'utf8'));
 const releaseDir = resolve(root, '../../release');
-const zipPath = resolve(releaseDir, `quickreply-extension-v${version}.zip`);
+const suffix = process.env.QR_ZIP_SUFFIX ? `-${process.env.QR_ZIP_SUFFIX}` : '';
+const zipPath = resolve(releaseDir, `quickreply-extension-v${version}${suffix}.zip`);
 
 await mkdir(releaseDir, { recursive: true });
 await rm(zipPath, { force: true });

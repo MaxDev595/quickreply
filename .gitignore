@@ -8,3 +8,11 @@ playwright-report/
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+qa/pages/react-app.js
+
+.dev.vars
+.wrangler/
+dist-testnet/
+
+.fixtures-build/

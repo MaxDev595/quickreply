@@ -7,7 +7,8 @@ QuickReply is a Chrome extension (Manifest V3) that saves the messages you type 
 ```
 quickreply/
 ├── apps/extension/   Chrome extension (React + Vite + Tailwind, MV3)
-├── apps/website/     Landing page (Next.js static export → Cloudflare Pages)
+├── apps/website/     Landing page (Next.js static export → Cloudflare Pages), /pricing
+├── apps/api/         Billing API, TEST MODE (Cloudflare Worker + D1, TON/USDT payments)
 ├── packages/shared/  Framework-free engine: types, matcher, variables, import/export
 ├── docs/             Spec, architecture, permissions, store listing, publishing, testing
 └── release/          Built Chrome Web Store ZIP (generated)
@@ -49,5 +50,7 @@ quickreply/
 - Global on/off, per-site off (from the popup or Settings), password/payment/OTP fields ignored
 - JSON export/import with validation, conflict handling (keep both / skip / replace) and full restore
 - Light, dark and system themes
+
+Billing (TON testnet test mode, not in the Store build): see [docs/BILLING.md](docs/BILLING.md).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how it works and [docs/TEST_REPORT.md](docs/TEST_REPORT.md) for what was verified.

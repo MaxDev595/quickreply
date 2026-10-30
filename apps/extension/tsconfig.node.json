@@ -1,8 +1,19 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node", "chrome"],
+    "types": [
+      "node",
+      "chrome"
+    ],
     "jsx": "react-jsx"
   },
-  "include": ["vite.config.ts", "vite.content.config.ts", "vitest.config.ts", "playwright.config.ts", "e2e"]
+  "include": [
+    "vite.config.ts",
+    "vite.content.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "playwright.real.config.ts",
+    "e2e",
+    "e2e-real"
+  ]
 }

@@ -2,7 +2,7 @@
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
-const dist = resolve(import.meta.dirname, '../dist');
+const dist = resolve(import.meta.dirname, '..', process.env.QR_OUT_DIR ?? 'dist');
 const errors = [];
 
 const manifest = JSON.parse(await readFile(join(dist, 'manifest.json'), 'utf8'));

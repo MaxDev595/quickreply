@@ -8,7 +8,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   publicDir: false,
   build: {
-    outDir: 'dist',
+    outDir: process.env.QR_OUT_DIR ?? 'dist',
     emptyOutDir: false,
     target: 'chrome116',
     sourcemap: false,

@@ -14,7 +14,9 @@ import {
 } from '@quickreply/shared';
 import { Download, Monitor, Moon, Sun, Upload, X } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
+import { billingEnabled } from '../lib/billing';
 import { updateLibrary, updateSettings, type AppState } from '../lib/storage';
+import { PlanSection } from './PlanSection';
 import { Button, ConfirmDialog, Toggle, cx, inputBase, inputClass } from '../ui/components';
 
 function Section({ title, description, children }: { title: string; description?: ReactNode; children: ReactNode }) {
@@ -159,6 +161,12 @@ export function SettingsView({ state, onToast }: { state: AppState; onToast: (m:
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-[880px] px-8 pt-8 pb-16">
         <h1 className="text-[22px] font-semibold tracking-[-0.01em]">Settings</h1>
+
+        {billingEnabled && (
+          <Section title="Plan" description="Your plan is checked with the QuickReply billing server.">
+            <PlanSection onToast={onToast} />
+          </Section>
+        )}
 
         <Section title="General" description="Pause QuickReply everywhere without losing your snippets.">
           <Row label="Enable QuickReply" description="When off, shortcuts are not expanded on any website.">

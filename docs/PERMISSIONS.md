@@ -14,7 +14,7 @@ Text expansion must work in whatever text field the user is typing in: email, CR
 
 ## `clipboardRead` (optional)
 
-Requested only when the user turns on the `{clipboard}` variable in Settings. Used only at the moment a snippet containing `{clipboard}` is inserted. Not requested at install.
+Requested only when the user turns on the `{clipboard}` variable in Settings. Used only at the moment a snippet containing `{clipboard}` is inserted: the content script reads the clipboard with `document.execCommand('paste')` into a temporary, immediately removed textarea and inserts the text. The clipboard content is never stored or transmitted. Not requested at install.
 
 ## Remote code
 

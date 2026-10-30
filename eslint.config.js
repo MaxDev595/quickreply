@@ -5,18 +5,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: [
-      '**/dist/**',
-      '**/out/**',
-      '**/.next/**',
-      '**/node_modules/**',
-      '**/test-results/**',
-      '**/.fixtures-build/**',
-      'release/**',
-      '**/next-env.d.ts',
-      // Prebuilt React fixture used by the public QA harness.
-      'apps/website/public/qa/react-app.js',
-    ],
+    ignores: ['**/dist/**', '**/dist-testnet/**', '**/.wrangler/**', '**/out/**', '**/.next/**', '**/node_modules/**', '**/test-results/**', '**/.fixtures-build/**', 'release/**', '**/next-env.d.ts', 'qa/pages/react-app.js'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

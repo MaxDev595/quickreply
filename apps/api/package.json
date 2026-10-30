@@ -1,0 +1,23 @@
+{
+  "name": "@quickreply/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "QuickReply billing API: TON/USDT invoices, on-chain payment matching, licenses (Cloudflare Worker + D1).",
+  "scripts": {
+    "dev": "wrangler d1 migrations apply quickreply-billing --local && wrangler dev --port 8787",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "deploy": "wrangler d1 migrations apply quickreply-billing --remote && wrangler deploy",
+    "test:int": "node --test --test-force-exit test-int/flow.test.mjs",
+    "pretest:int": "node -e \"require('fs').rmSync('.wrangler/int-state',{recursive:true,force:true})\" && wrangler d1 migrations apply quickreply-billing --local --persist-to .wrangler/int-state"
+  },
+  "dependencies": {
+    "@quickreply/shared": "*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261030.1",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.156.0"
+  }
+}

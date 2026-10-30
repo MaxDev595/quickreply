@@ -1,5 +1,6 @@
 import { isGetPageInfoRequest, type PageInfo } from '../lib/messages';
 import { loadState, recordUsage, subscribe } from '../lib/storage';
+import { readClipboard } from './clipboard';
 import { Expander } from './expander';
 
 /** Hostname of the top-level page, so site exclusions also cover embedded editors. */
@@ -15,15 +16,6 @@ function pageHostname(): string {
     }
   }
   return location.hostname;
-}
-
-async function readClipboard(): Promise<string> {
-  try {
-    return await navigator.clipboard.readText();
-  } catch {
-    // Permission not granted or page not focused: insert nothing rather than fail.
-    return '';
-  }
 }
 
 /** After an extension update the old content script loses its runtime. */

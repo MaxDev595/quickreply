@@ -10,7 +10,10 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "icons": "node scripts/generate-icons.mjs",
-    "package": "npm run build && node scripts/package.mjs"
+    "package": "npm run build && node scripts/package.mjs",
+    "test:real": "playwright test -c playwright.real.config.ts",
+    "build:testnet": "node scripts/build-testnet.mjs",
+    "package:testnet": "node scripts/build-testnet.mjs && node -e \"process.env.QR_OUT_DIR='dist-testnet';process.env.QR_ZIP_SUFFIX='TESTNET-not-for-store';import('./scripts/package.mjs')\""
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

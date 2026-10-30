@@ -5,6 +5,7 @@ const NAV = [
   { href: '/#features', label: 'Features' },
   { href: '/#how-it-works', label: 'How It Works' },
   { href: '/#faq', label: 'FAQ' },
+  { href: '/pricing/', label: 'Pricing' },
 ];
 
 export function SiteHeader() {
