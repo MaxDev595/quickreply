@@ -171,6 +171,23 @@ export function Checkout() {
       <div className="grid gap-8 lg:grid-cols-[1fr_420px]">
         <div>
           <h2 className="text-[24px] font-semibold tracking-[-0.02em]">Choose a plan</h2>
+          <div className="mt-5 rounded-xl border border-line p-4" aria-label="Free plan">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <div>
+                <span className="text-[15px] font-semibold">{PLANS.free.name}</span>
+                <span className="ml-2 text-[22px] font-semibold tracking-[-0.02em]">$0</span>
+              </div>
+              <span className="text-[13px] text-muted">Included with the extension, no payment or account</span>
+            </div>
+            <ul className="mt-3 grid gap-1 text-[13px] text-muted sm:grid-cols-2">
+              {PLANS.free.features.map((f) => (
+                <li key={f} className="flex gap-1.5">
+                  <Check size={14} className="mt-0.5 shrink-0 text-accent" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
           <div role="radiogroup" aria-label="Plan" className="mt-5 grid gap-3 sm:grid-cols-3">
             {PAID_PLANS.map((id) => {
               const info = PLANS[id];

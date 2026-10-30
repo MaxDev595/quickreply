@@ -33,7 +33,14 @@ export const PLANS: Record<PlanId, PlanInfo> = {
     perSeat: false,
     periodDays: 0,
     devices: 1,
-    features: ['Up to 5 snippets', 'Works on every website', 'Variables and fill-in fields', 'Import and export'],
+    features: [
+      'Up to 5 snippets',
+      'Unlimited insertions on every website',
+      'Gmail, forms and rich text editors',
+      'Date, time, clipboard and fill-in variables',
+      'Folders, favorites and search',
+      'Import, export and dark theme',
+    ],
   },
   pro_monthly: {
     id: 'pro_monthly',
